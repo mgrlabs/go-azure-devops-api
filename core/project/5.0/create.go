@@ -1,4 +1,7 @@
-package devopsprojectcreate
+package projectcreate
+
+// https://docs.microsoft.com/en-us/rest/api/azure/devops/core/projects/create?view=azure-devops-rest-5.0
+//
 
 import (
 	"bytes"
@@ -21,13 +24,13 @@ type ProjectResponse struct {
 	URL    string `json:"url"`
 }
 
-// Comment
-func CreateProject(pat, organization, projectName string) ProjectResponse {
+// CreateProject creates the Azure DevOps project
+func CreateProject(pat, organization, projectName, workItemProcess string) ProjectResponse {
 
-	// PATEncoded := b64.StdEncoding.EncodeToString([]byte(":" + pat))
+	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(pat)
 
-	var jsonFormat = "{ \"name\": \"" + projectName + "\", \"description\": \"Frabrikam travel app for Windows Phone\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"Git\"}, \"processTemplate\": {  \"templateTypeId\": \"6b724908-ef14-45cf-84f8-768b5384da45\" }}}"
+	var jsonFormat = "{ \"name\": \"" + projectName + "\", \"description\": \"Frabrikam travel app for Windows Phone\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"Git\"}, \"processTemplate\": {  \"templateTypeId\": \"" + workItemProcess + "\" }}}"
 
 	var jsonStr = []byte(jsonFormat)
 
