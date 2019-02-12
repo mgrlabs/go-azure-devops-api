@@ -25,12 +25,12 @@ type ProjectResponse struct {
 }
 
 // CreateProject creates the Azure DevOps project
-func CreateProject(pat, organization, projectName, workItemProcess string) ProjectResponse {
+func CreateProject(pat, organization, projectName, workItemProcess, description string) ProjectResponse {
 
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(pat)
 
-	var jsonFormat = "{ \"name\": \"" + projectName + "\", \"description\": \"Frabrikam travel app for Windows Phone\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"Git\"}, \"processTemplate\": {  \"templateTypeId\": \"" + workItemProcess + "\" }}}"
+	var jsonFormat = "{ \"name\": \"" + projectName + "\", \"description\": \"" + description + "\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"Git\"}, \"processTemplate\": {  \"templateTypeId\": \"" + workItemProcess + "\" }}}"
 
 	var jsonStr = []byte(jsonFormat)
 
