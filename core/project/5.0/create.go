@@ -21,9 +21,9 @@ type ProjectResponse struct {
 }
 
 // Comment
-func CreateProject(pat string, organization string, projectName string) ProjectResponse {
+func CreateProject(pat, organization, projectName string) ProjectResponse {
 
-	patEncoded := b64.StdEncoding.EncodeToString([]byte(":" + pat))
+	PATEncoded := b64.StdEncoding.EncodeToString([]byte(":" + pat))
 
 	var jsonFormat = "{ \"name\": \"" + projectName + "\", \"description\": \"Frabrikam travel app for Windows Phone\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"Git\"}, \"processTemplate\": {  \"templateTypeId\": \"6b724908-ef14-45cf-84f8-768b5384da45\" }}}"
 
@@ -33,7 +33,7 @@ func CreateProject(pat string, organization string, projectName string) ProjectR
 
 	req, err := http.NewRequest("POST", baseURL, bytes.NewBuffer(jsonStr))
 
-	basic := "Basic " + patEncoded
+	basic := "Basic " + PATEncoded
 
 	req.Header.Set("Authorization", basic)
 	req.Header.Set("Content-Type", "application/json")
