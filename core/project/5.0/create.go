@@ -34,21 +34,15 @@ func CreateProject(pat, organization, projectName, workItemProcess, description 
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(pat)
 
-	var jsonFormat = "{ \"name\": \"" + projectName + "\", \"description\": \"" + description + "\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"Git\"}, \"processTemplate\": {  \"templateTypeId\": \"" + workItemProcess + "\" }}}"
-
-	var jsonStr = []byte(jsonFormat)
-
+	jsonStr := []byte("{ \"name\": \"" + projectName + "\", \"description\": \"" + description + "\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"Git\"}, \"processTemplate\": {  \"templateTypeId\": \"" + workItemProcess + "\" }}}")
 	callURL := baseURL + organization + apiURL
-
 	req, err := http.NewRequest("POST", callURL, bytes.NewBuffer(jsonStr))
-
 	basic := "Basic " + encodedPAT
 
 	req.Header.Set("Authorization", basic)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
-
 	resp, err := client.Do(req)
 
 	if err != nil {
