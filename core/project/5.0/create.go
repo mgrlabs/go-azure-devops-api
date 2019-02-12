@@ -1,4 +1,4 @@
-package projectcreate
+package coreprojectcreate
 
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/core/projects/create?view=azure-devops-rest-5.0
 //
@@ -13,6 +13,10 @@ import (
 
 	tools "github.com/mgrlabs/go-azure-devops-api/tools"
 )
+
+var apiVersion = "5.0"
+var baseURL = "https://dev.azure.com/"
+var apiURL = "/_apis/projects?api-version=" + apiVersion
 
 //Client for manage azure devops organization
 type Client struct {
@@ -34,9 +38,9 @@ func CreateProject(pat, organization, projectName, workItemProcess, description 
 
 	var jsonStr = []byte(jsonFormat)
 
-	var baseURL = "https://dev.azure.com/" + organization + "/_apis/projects?api-version=5.0"
+	callURL := baseURL + organization + apiURL
 
-	req, err := http.NewRequest("POST", baseURL, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", callURL, bytes.NewBuffer(jsonStr))
 
 	basic := "Basic " + encodedPAT
 
