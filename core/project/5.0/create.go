@@ -29,12 +29,12 @@ type ProjectResponse struct {
 }
 
 // CreateProject creates the Azure DevOps project
-func CreateProject(pat, organization, projectName, workItemProcess, description string) ProjectResponse {
+func CreateProject(pat, organization, projectName, workItemProcess, description, versionControl string) ProjectResponse {
 
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(pat)
 
-	jsonStr := []byte("{ \"name\": \"" + projectName + "\", \"description\": \"" + description + "\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"Git\"}, \"processTemplate\": {  \"templateTypeId\": \"" + workItemProcess + "\" }}}")
+	jsonStr := []byte("{ \"name\": \"" + projectName + "\", \"description\": \"" + description + "\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"" + versionControl + "\"}, \"processTemplate\": {  \"templateTypeId\": \"" + workItemProcess + "\" }}}")
 	callURL := baseURL + organization + apiURL
 	req, err := http.NewRequest("POST", callURL, bytes.NewBuffer(jsonStr))
 	basic := "Basic " + encodedPAT
