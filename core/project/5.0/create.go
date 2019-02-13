@@ -12,11 +12,12 @@ import (
 	"net/http"
 
 	tools "github.com/mgrlabs/go-azure-devops-api/tools"
+	// processlist "github.com/mgrlabs/go-azure-devops-api/workitemtrackingprocess/processes/5.0"
 )
 
 var apiVersion = "5.0"
 var baseURL = "https://dev.azure.com/"
-var apiURL = "/_apis/projects?api-version=" + apiVersion
+var apiURL = "/_apis/projects?api-version="
 
 //Client for manage azure devops organization
 type Client struct {
@@ -33,6 +34,7 @@ func CreateProject(pat, organization, projectName, workItemProcess, description,
 
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(pat)
+	// processGUIDs := processlist.listProcessTemplates(encodedPAT)
 
 	processTemplates := map[string]string{
 		"Agile": "adcc42ab-9882-485e-a3ed-7678f01f66bc",
@@ -41,7 +43,7 @@ func CreateProject(pat, organization, projectName, workItemProcess, description,
 	}
 
 	jsonStr := []byte("{ \"name\": \"" + projectName + "\", \"description\": \"" + description + "\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"" + versionControl + "\"}, \"processTemplate\": {  \"templateTypeId\": \"" + processTemplates[workItemProcess] + "\" }}}")
-	callURL := baseURL + organization + apiURL
+	callURL := baseURL + organization + apiURL + apiVersion
 	req, err := http.NewRequest("POST", callURL, bytes.NewBuffer(jsonStr))
 	basic := "Basic " + encodedPAT
 
