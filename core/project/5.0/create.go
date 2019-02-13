@@ -34,7 +34,13 @@ func CreateProject(pat, organization, projectName, workItemProcess, description,
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(pat)
 
-	jsonStr := []byte("{ \"name\": \"" + projectName + "\", \"description\": \"" + description + "\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"" + versionControl + "\"}, \"processTemplate\": {  \"templateTypeId\": \"" + workItemProcess + "\" }}}")
+	processTemplates := map[string]string{
+		"Agile": "adcc42ab-9882-485e-a3ed-7678f01f66bc",
+		"Scrum": "6b724908-ef14-45cf-84f8-768b5384da45",
+		"CMMI":  "27450541-8e31-4150-9947-dc59f998fc01",
+	}
+
+	jsonStr := []byte("{ \"name\": \"" + projectName + "\", \"description\": \"" + description + "\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"" + versionControl + "\"}, \"processTemplate\": {  \"templateTypeId\": \"" + processTemplates[workItemProcess] + "\" }}}")
 	callURL := baseURL + organization + apiURL
 	req, err := http.NewRequest("POST", callURL, bytes.NewBuffer(jsonStr))
 	basic := "Basic " + encodedPAT
