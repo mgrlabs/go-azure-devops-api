@@ -12,7 +12,6 @@ import (
 	"net/http"
 
 	tools "github.com/mgrlabs/go-azure-devops-api/tools"
-	// processlist "github.com/mgrlabs/go-azure-devops-api/workitemtrackingprocess/processes/5.0"
 )
 
 var apiVersion = "5.0"
@@ -34,12 +33,26 @@ func CreateProject(pat, organization, projectName, workItemProcess, description,
 
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(pat)
-	// processGUIDs := processlist.listProcessTemplates(encodedPAT)
+	// processGUIDs := processlist.listProcessTemplates(encodedPAT, organization)
 
 	processTemplates := map[string]string{
 		"Agile": "adcc42ab-9882-485e-a3ed-7678f01f66bc",
 		"Scrum": "6b724908-ef14-45cf-84f8-768b5384da45",
+		"Basic": "b8a3a935-7e91-48b8-a94c-606d37c3e9f2",
 		"CMMI":  "27450541-8e31-4150-9947-dc59f998fc01",
+	}
+
+	type Payload struct {
+		Name         string `json:"name"`
+		Description  string `json:"description"`
+		Capabilities struct {
+			Versioncontrol struct {
+				SourceControlType string `json:"sourceControlType"`
+			} `json:"versioncontrol"`
+			ProcessTemplate struct {
+				TemplateTypeID string `json:"templateTypeId"`
+			} `json:"processTemplate"`
+		} `json:"capabilities"`
 	}
 
 	jsonStr := []byte("{ \"name\": \"" + projectName + "\", \"description\": \"" + description + "\", \"capabilities\": { \"versioncontrol\": { \"sourceControlType\": \"" + versionControl + "\"}, \"processTemplate\": {  \"templateTypeId\": \"" + processTemplates[workItemProcess] + "\" }}}")
