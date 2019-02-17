@@ -1,31 +1,35 @@
 package processlist
 
 import (
-	"bytes"
+	"io/ioutil"
+	"log"
 	"net/http"
 )
 
-// https://docs.microsoft.com/en-us/rest/api/azure/devops/processes/processes/list?view=azure-devops-rest-5.0
-
-// import (
-// 	"bytes"
-// 	"encoding/json"
-// 	"fmt"
-// 	"io/ioutil"
-// 	"log"
-// 	"net/http"
-// )
-
 var apiVersion = "5.0-preview.2"
-var baseURL = "https://dev.azure.com/"
-var apiURL = "/_apis/work/processes?api-version="
+var baseURI = "https://dev.azure.com/"
+var apiPath = "/_apis/work/processes?api-version="
 
-func listProcessTemplates(encodedPAT, organization string) (processList map[string]string) {
+func listProcessTemplates(encodedPAT, azureDevopsOrg string) (processTemplates string) {
 
-	callURL := baseURL + organization + apiURL + apiVersion
-	req, err := http.NewRequest("POST", callURL, bytes.NewBuffer(jsonStr))
-	basic := "Basic " + encodedPAT
+	requestURL := baseURI + azureDevopsOrg + apiPath + apiVersion
+	req, err := http.NewRequest("GET", requestURL, nil)
+	req.Header.Set("Authorization", "Basic "+encodedPAT)
 
-	req.Header.Set("Authorization", basic)
-	return
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal("Do: ", err)
+		return
+	}
+
+	// Close the response body
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	processTemplates = string(body)
+	return processTemplates
 }
