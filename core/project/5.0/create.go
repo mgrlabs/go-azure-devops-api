@@ -7,12 +7,12 @@ package coreprojectcreate
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	tools "github.com/mgrlabs/go-azure-devops-api/tools"
+	processes "github.com/mgrlabs/go-azure-devops-api/workitemtrackingprocess/processes/5.0"
+	gjson "github.com/tidwall/gjson"
 )
 
 var apiVersion = "5.0-preview.2"
@@ -56,18 +56,14 @@ type ProjectResponse struct {
 }
 
 // CreateProject creates the Azure DevOps project
-func CreateProject(pat, azureDevopsOrg, projectName, workItemProcess, description, versionControl string) ProjectResponse {
+func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, description, versionControl string) ProjectResponse {
 
-	// Manual mapping for work process templates - To be replaced by API call
-	processTemplates := map[string]string{
-		"Agile": "adcc42ab-9882-485e-a3ed-7678f01f66bc",
-		"Scrum": "6b724908-ef14-45cf-84f8-768b5384da45",
-		"Basic": "b8a3a935-7e91-48b8-a94c-606d37c3e9f2",
-		"CMMI":  "27450541-8e31-4150-9947-dc59f998fc01",
-	}
+	// Call to work item process list function, returns JSON payload containing templates
+	processTemplates := processes.ProcessTemplates(PAT, azureDevopsOrg)
+	workProcessGUID := gjson.Get(processTemplates, `value.#[name="`+workItemProcess+`"].typeId`)
 
 	// Call to PAT encode function
-	encodedPAT := tools.PATEncode(pat)
+	encodedPAT := tools.PATEncode(PAT)
 
 	// Pass Project-specific parms into variable
 	payload := Payload{
@@ -78,7 +74,7 @@ func CreateProject(pat, azureDevopsOrg, projectName, workItemProcess, descriptio
 				SourceControlType: versionControl,
 			},
 			ProcessTemplate: ProcessTemplateID{
-				TemplateTypeID: processTemplates[workItemProcess],
+				TemplateTypeID: workProcessGUID.String(),
 			},
 		},
 	}
@@ -86,7 +82,7 @@ func CreateProject(pat, azureDevopsOrg, projectName, workItemProcess, descriptio
 	// Build JSON Payload
 	payloadJSON, err := json.Marshal(payload)
 	if err != nil {
-		fmt.Println("Hello")
+		panic(err)
 	}
 
 	// Build API call
@@ -103,13 +99,13 @@ func CreateProject(pat, azureDevopsOrg, projectName, workItemProcess, descriptio
 	}
 
 	// Decode response body
-	responseData, err := ioutil.ReadAll(resp.Body)
+	response, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	data := ProjectResponse{}
-	json.Unmarshal([]byte(responseData), &data)
+	json.Unmarshal([]byte(response), &data)
 
 	return data
 }
