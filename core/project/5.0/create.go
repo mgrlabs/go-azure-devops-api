@@ -15,7 +15,7 @@ import (
 	gjson "github.com/tidwall/gjson"
 )
 
-var apiVersion = "5.0-preview.2"
+var apiVersion = "5.0"
 var baseURI = "https://dev.azure.com/"
 var apiPath = "/_apis/projects?api-version="
 
@@ -42,8 +42,6 @@ type ProcessTemplateID struct {
 	TemplateTypeID string `json:"templateTypeId"`
 }
 
-// Payload for Project creation - END
-
 // Client struct - Usage TBD
 type Client struct {
 }
@@ -59,8 +57,8 @@ type ProjectResponse struct {
 func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, description, versionControl string) ProjectResponse {
 
 	// Call to work item process list function, returns JSON payload containing templates
-	// processResponse := processes.ProcessTemplates(PAT, azureDevopsOrg)
-	processGUID := gjson.Get(processes.ProcessTemplates(PAT, azureDevopsOrg), `value.#[name="`+workItemProcess+`"].typeId`)
+	processGUID := gjson.Get(processes.ProcessTemplates(PAT, azureDevopsOrg),
+		`value.#[name="`+workItemProcess+`"].typeId`)
 
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(PAT)
