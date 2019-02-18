@@ -22,6 +22,7 @@ var apiPath = "/_apis/projects?api-version="
 // Payload for Project creation - Outer
 type Payload struct {
 	Name         string       `json:"name"`
+	Visibility   string       `json:"visibility"`
 	Description  string       `json:"description"`
 	Capabilities Capabilities `json:"capabilities"`
 }
@@ -54,7 +55,7 @@ type ProjectResponse struct {
 }
 
 // CreateProject creates the Azure DevOps project
-func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, description, versionControl string) ProjectResponse {
+func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, description, versionControl, visibility string) ProjectResponse {
 
 	// Call to work item process list function, returns JSON payload containing templates
 	processGUID := gjson.Get(processes.ProcessTemplates(PAT, azureDevopsOrg),
@@ -66,6 +67,7 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 	// Pass Project-specific parms into variable
 	payload := Payload{
 		Name:        projectName,
+		Visibility:  visibility,
 		Description: description,
 		Capabilities: Capabilities{
 			VersionControl: SourceControl{
