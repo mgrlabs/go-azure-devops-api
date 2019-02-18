@@ -1,8 +1,8 @@
-// Package coreprojectcreate for Azure DevOps Go SDK
+// Package coreproject for Azure DevOps Go SDK
 // by mgrlabs - github.com/mgrlabs
 //
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/core/projects/create?view=azure-devops-rest-5.0
-package coreprojectcreate
+package coreproject
 
 import (
 	"bytes"

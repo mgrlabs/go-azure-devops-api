@@ -1,8 +1,8 @@
-// Package encodepat for Azure DevOps Go SDK
+// Package tools for Azure DevOps Go SDK
 // Encodes a standard Azure DevOps Personal Access Token and returns it encoded for API auth
 // by mgrlabs - github.com/mgrlabs
 //
-package encodepat
+package tools
 
 import (
 	b64 "encoding/base64"
