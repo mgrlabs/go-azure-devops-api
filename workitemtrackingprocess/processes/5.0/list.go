@@ -21,12 +21,13 @@ func ProcessTemplates(PAT, azureDevopsOrg string) (responseJSON string) {
 
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(PAT)
+
 	// Build API call
 	requestURL := baseURI + azureDevopsOrg + apiPath + apiVersion
 	req, err := http.NewRequest("GET", requestURL, nil)
 	req.Header.Set("Authorization", "Basic "+encodedPAT)
 
-	// Request Project creation
+	// Queue project creation
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
