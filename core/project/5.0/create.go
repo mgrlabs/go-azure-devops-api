@@ -59,8 +59,8 @@ type ProjectResponse struct {
 func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, description, versionControl string) ProjectResponse {
 
 	// Call to work item process list function, returns JSON payload containing templates
-	processTemplates := processes.ProcessTemplates(PAT, azureDevopsOrg)
-	workProcessGUID := gjson.Get(processTemplates, `value.#[name="`+workItemProcess+`"].typeId`)
+	// processResponse := processes.ProcessTemplates(PAT, azureDevopsOrg)
+	processGUID := gjson.Get(processes.ProcessTemplates(PAT, azureDevopsOrg), `value.#[name="`+workItemProcess+`"].typeId`)
 
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(PAT)
@@ -74,7 +74,7 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 				SourceControlType: versionControl,
 			},
 			ProcessTemplate: ProcessTemplateID{
-				TemplateTypeID: workProcessGUID.String(),
+				TemplateTypeID: processGUID.String(),
 			},
 		},
 	}
