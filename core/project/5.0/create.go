@@ -124,7 +124,6 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 		var s string
 		for s != "succeeded" {
 			r := operations.OpsStatus(PAT, data.ID, azureDevopsOrg)
-			fmt.Println(r)
 			s = gjson.Get(r, "status").String()
 			switch s {
 			case "inProgress", "queued":
@@ -132,7 +131,7 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 			case "succeeded":
 				time.Sleep(500 * time.Millisecond)
 				g := gjson.Get(ProjectList(PAT, azureDevopsOrg), `value.#[name="`+projectName+`"].id`)
-				fmt.Println("The Project GUID is " + g.String())
+				data.ID = g.String()
 				return data
 			case "failed", "cancelled":
 				return data
