@@ -7,17 +7,16 @@ package coreproject
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
+	operations "github.com/mgrlabs/go-azure-devops-api/operations/5.0"
 	tools "github.com/mgrlabs/go-azure-devops-api/tools"
 	processes "github.com/mgrlabs/go-azure-devops-api/workitemtrackingprocess/processes/5.0"
 	gjson "github.com/tidwall/gjson"
 )
-
-var apiVersion = "5.0"
-var baseURI = "https://dev.azure.com/"
-var apiPath = "/_apis/projects?api-version="
 
 // Payload for Project creation - Outer
 type Payload struct {
@@ -57,6 +56,10 @@ type ProjectResponse struct {
 // CreateProject creates the Azure DevOps project
 func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, description, versionControl, visibility string) ProjectResponse {
 
+	var apiVersion = "5.0"
+	var baseURI = "https://dev.azure.com/"
+	var apiPath = "/_apis/projects?api-version="
+
 	// Call to work item process list function, returns JSON payload containing templates
 	processGUID := gjson.Get(processes.ProcessTemplates(PAT, azureDevopsOrg),
 		`value.#[name="`+workItemProcess+`"].typeId`)
@@ -82,12 +85,17 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 	// Build JSON Payload
 	payloadJSON, err := json.Marshal(payload)
 	if err != nil {
+		// function should not panic, need to return the err!!!
 		panic(err)
 	}
 
 	// Build API call
 	requestURL := baseURI + azureDevopsOrg + apiPath + apiVersion
 	req, err := http.NewRequest("POST", requestURL, bytes.NewBuffer(payloadJSON))
+	if err != nil {
+		// function should not panic, need to return the err!!!
+		panic(err)
+	}
 	req.Header.Set("Authorization", "Basic "+encodedPAT)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -95,17 +103,42 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		// function should not panic, need to return the err!!!
 		panic(err)
 	}
 
 	// Decode response body
-	response, err := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		// function should not panic, need to return the err!!!
 		panic(err)
 	}
 
 	data := ProjectResponse{}
-	json.Unmarshal([]byte(response), &data)
+	json.Unmarshal([]byte(body), &data)
 
+	if gjson.Get(string(body), "message").Exists() {
+		r := gjson.Get(string(body), "message")
+		fmt.Printf("ERROR: %s\n", r)
+	} else {
+		var s string
+		for s != "succeeded" {
+			r := operations.OpsStatus(PAT, data.ID, azureDevopsOrg)
+			fmt.Println(r)
+			s = gjson.Get(r, "status").String()
+			switch s {
+			case "inProgress", "queued":
+				println("Creating DevOps project: " + projectName + "...")
+			case "succeeded":
+				time.Sleep(500 * time.Millisecond)
+				g := gjson.Get(ProjectList(PAT, azureDevopsOrg), `value.#[name="`+projectName+`"].id`)
+				fmt.Println("The Project GUID is " + g.String())
+				return data
+			case "failed", "cancelled":
+				return data
+			}
+			time.Sleep(2 * time.Second)
+		}
+	}
 	return data
 }
