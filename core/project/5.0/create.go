@@ -83,17 +83,20 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 
 	// Build JSON Payload
 	payloadJSON, err := json.Marshal(payload)
+	data := ProjectResponse{}
 	if err != nil {
-		// function should not panic, need to return the err!!!
-		panic(err)
+		data.ID = "1"
+		data.Status = "ERROR: Could not build JSON payload!"
+		return data
 	}
 
 	// Build API call
 	requestURL := baseURI + azureDevopsOrg + apiPath + apiVersion
 	req, err := http.NewRequest("POST", requestURL, bytes.NewBuffer(payloadJSON))
 	if err != nil {
-		// function should not panic, need to return the err!!!
-		panic(err)
+		data.ID = "1"
+		data.Status = "ERROR: Could not build API Call!"
+		return data
 	}
 	req.Header.Set("Authorization", "Basic "+encodedPAT)
 	req.Header.Set("Content-Type", "application/json")
@@ -102,18 +105,19 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		// function should not panic, need to return the err!!!
-		panic(err)
+		data.ID = "1"
+		data.Status = "ERROR: Could not connect to Azure DevOps API!"
+		return data
 	}
 
 	// Decode response body
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		// function should not panic, need to return the err!!!
-		panic(err)
+		data.ID = "1"
+		data.Status = "ERROR: Could not read API response!"
+		return data
 	}
 
-	data := ProjectResponse{}
 	json.Unmarshal([]byte(body), &data)
 
 	if gjson.Get(string(body), "message").Exists() {
@@ -136,10 +140,12 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 				return data
 			case "failed", "cancelled":
 				data.ID = "1"
-				data.Status = "ERROR"
+				data.Status = "Unknown Error has occured!"
 				return data
 			}
 		}
 	}
+	data.ID = "1"
+	data.Status = "Unknown Error has occured!"
 	return data
 }
