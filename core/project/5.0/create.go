@@ -7,7 +7,6 @@ package coreproject
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -119,24 +118,27 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 
 	if gjson.Get(string(body), "message").Exists() {
 		r := gjson.Get(string(body), "message")
-		fmt.Printf("ERROR: %s\n", r)
+		data.ID = "1"
+		data.Status = r.String()
+		return data
 	} else {
 		var s string
 		for s != "succeeded" {
 			r := operations.OpsStatus(PAT, data.ID, azureDevopsOrg)
 			s = gjson.Get(r, "status").String()
 			switch s {
-			case "inProgress", "queued":
-				println("Creating DevOps project: " + projectName + "...")
+			case "inProgress", "queued", "notSet":
+				time.Sleep(2 * time.Second)
 			case "succeeded":
-				time.Sleep(500 * time.Millisecond)
+				time.Sleep(1 * time.Second)
 				g := gjson.Get(ProjectList(PAT, azureDevopsOrg), `value.#[name="`+projectName+`"].id`)
 				data.ID = g.String()
 				return data
 			case "failed", "cancelled":
+				data.ID = "1"
+				data.Status = "ERROR"
 				return data
 			}
-			time.Sleep(2 * time.Second)
 		}
 	}
 	return data
