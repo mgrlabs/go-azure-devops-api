@@ -135,7 +135,7 @@ func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, descriptio
 				time.Sleep(2 * time.Second)
 			case "succeeded":
 				time.Sleep(1 * time.Second)
-				g := gjson.Get(ProjectList(PAT, azureDevopsOrg), `value.#[name="`+projectName+`"].id`)
+				g := gjson.Get(ListProjects(PAT, azureDevopsOrg), `value.#[name="`+projectName+`"].id`)
 				data.ID = g.String()
 				return data
 			case "failed", "cancelled":
