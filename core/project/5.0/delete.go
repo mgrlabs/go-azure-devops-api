@@ -19,6 +19,7 @@ import (
 // DeleteProject creates the Azure DevOps project
 func DeleteProject(PAT, azureDevopsOrg, projectGUID string) ProjectResponse {
 
+	// API-specific settings
 	var apiVersion = "?api-version=5.0"
 	var baseURI = "https://dev.azure.com/"
 	var apiPath = "/_apis/projects/"

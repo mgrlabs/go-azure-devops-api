@@ -1,6 +1,5 @@
 // Package coreproject for Azure DevOps Go SDK
 // by mgrlabs - github.com/mgrlabs
-//
 // https://docs.microsoft.com/en-us/rest/api/azure/devops/core/projects/create?view=azure-devops-rest-5.0
 package coreproject
 
@@ -55,6 +54,7 @@ type ProjectResponse struct {
 // CreateProject creates the Azure DevOps project
 func CreateProject(PAT, azureDevopsOrg, projectName, workItemProcess, description, versionControl, visibility string) ProjectResponse {
 
+	// API-specific settings
 	var apiVersion = "5.0"
 	var baseURI = "https://dev.azure.com/"
 	var apiPath = "/_apis/projects?api-version="

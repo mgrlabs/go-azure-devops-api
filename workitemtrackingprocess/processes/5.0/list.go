@@ -12,12 +12,13 @@ import (
 	tools "github.com/mgrlabs/go-azure-devops-api/tools"
 )
 
-var apiVersion = "5.0-preview.2"
-var baseURI = "https://dev.azure.com/"
-var apiPath = "/_apis/work/processes?api-version="
-
 // ProcessTemplates function returns the work item process templates as a JSON payload
 func ProcessTemplates(PAT, azureDevopsOrg string) (responseJSON string) {
+
+	// API-specific settings
+	var apiVersion = "5.0-preview.2"
+	var baseURI = "https://dev.azure.com/"
+	var apiPath = "/_apis/work/processes?api-version="
 
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(PAT)
@@ -31,7 +32,7 @@ func ProcessTemplates(PAT, azureDevopsOrg string) (responseJSON string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	// Close the response body
