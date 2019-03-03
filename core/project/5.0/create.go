@@ -45,7 +45,7 @@ type ProcessTemplateID struct {
 type Client struct {
 }
 
-// ProjectResponse struct - Usage TBD
+// ProjectResponse struct
 type ProjectResponse struct {
 	ID     string `json:"id"`
 	Status string `json:"status"`
