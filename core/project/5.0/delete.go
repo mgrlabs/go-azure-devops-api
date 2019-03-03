@@ -10,24 +10,20 @@ import (
 	"net/http"
 
 	tools "github.com/mgrlabs/go-azure-devops-api/tools"
-	gjson "github.com/tidwall/gjson"
 )
 
 // DeleteProject creates the Azure DevOps project
-func DeleteProject(PAT, azureDevopsOrg, projectName string) (responseJSON string) {
+func DeleteProject(PAT, azureDevopsOrg, projectGUID string) (responseJSON string) {
 
 	var apiVersion = "?api-version=5.0"
 	var baseURI = "https://dev.azure.com/"
 	var apiPath = "/_apis/projects/"
 
-	// Extract the GUID of the project
-	projectGUID := gjson.Get(ListProjects(PAT, azureDevopsOrg), `value.#[name="`+projectName+`"].id`)
-
 	// Call to PAT encode function
 	encodedPAT := tools.PATEncode(PAT)
 
 	// Build the API Call
-	requestURL := baseURI + azureDevopsOrg + apiPath + projectGUID.String() + apiVersion
+	requestURL := baseURI + azureDevopsOrg + apiPath + projectGUID + apiVersion
 	req, err := http.NewRequest("DELETE", requestURL, bytes.NewBuffer(nil))
 	req.Header.Set("Authorization", "Basic "+encodedPAT)
 	if err != nil {
